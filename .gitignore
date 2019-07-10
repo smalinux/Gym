@@ -22,3 +22,6 @@ $RECYCLE.BIN/
 # Operating System Files
 # =========================
 temp.c
+
+compiling_error.txt
+*.exe
