@@ -1,0 +1,24 @@
+D:\__C\codes\temp.c: In function 'create_game':
+D:\__C\codes\temp.c:39:2: error: 'for' loop initial declarations are only allowed in C99 or C11 mode
+  for(int i = 0;i < MAP_WIDTH;i++){
+  ^
+D:\__C\codes\temp.c:39:2: note: use option -std=c99, -std=gnu99, -std=c11 or -std=gnu11 to compile your code
+D:\__C\codes\temp.c:40:3: error: 'for' loop initial declarations are only allowed in C99 or C11 mode
+   for(int j = 0;j < MAP_HEIGHT;j++){
+   ^
+D:\__C\codes\temp.c:46:10: error: redefinition of 'i'
+  for(int i = 0;i < 20;i++){
+          ^
+D:\__C\codes\temp.c:39:10: note: previous definition of 'i' was here
+  for(int i = 0;i < MAP_WIDTH;i++){
+          ^
+D:\__C\codes\temp.c:46:2: error: 'for' loop initial declarations are only allowed in C99 or C11 mode
+  for(int i = 0;i < 20;i++){
+  ^
+D:\__C\codes\temp.c: In function 'print_map':
+D:\__C\codes\temp.c:105:2: error: 'for' loop initial declarations are only allowed in C99 or C11 mode
+  for(int i = 0;i < MAP_HEIGHT;i++){
+  ^
+D:\__C\codes\temp.c:106:3: error: 'for' loop initial declarations are only allowed in C99 or C11 mode
+   for(int j = 0;j < MAP_WIDTH;j++){
+   ^
