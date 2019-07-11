@@ -1,5 +1,6 @@
 #include "stdlib.h"
 #include "ncurses.h"
+#include "time.h"
 
 typedef struct Position
 {
@@ -13,6 +14,7 @@ typedef struct Room
 	Position position;
 	int height;
 	int width;
+	Position doors[4];
 	//
 	// Monster ** monsters;		// pointer to array of structs ! i think !!
 	// Item ** items;
@@ -89,6 +91,21 @@ Room * createRoom(int y, int x, int height, int width ) {
 	newRoom->position.x		= x;
 	newRoom->height			= height;
 	newRoom->width			= width;
+	//
+	srand(time(NULL));
+	/* Top door */
+	newRoom->doors[0].x 		= rand() % width + newRoom->position.x;
+	newRoom->doors[0].y 		= newRoom->position.y;
+	/* Bottom door */
+	newRoom->doors[0].x 		= rand() % width + newRoom->position.x;
+	newRoom->doors[0].y 		= newRoom->position.y + newRoom->height;
+	/* Left door */
+	newRoom->doors[0].x 		= newRoom->position.x;
+	newRoom->doors[0].y 		= rand() % height + newRoom->position.y;
+	/* Right door */
+	newRoom->doors[0].x 		= newRoom->position.x + width;
+	newRoom->doors[0].y 		= rand() % height + newRoom->position.y;
+
 	return newRoom;
 }
 
@@ -169,5 +186,10 @@ int drawRoom(Room * room) {
 			mvprintw(y, x, ".");
 		}
 	}
+	/* Draw doors */
+	mvprintw(room->doors[0].y, room->doors[0].x, "++");
+	mvprintw(room->doors[1].y, room->doors[1].x, "++");
+	mvprintw(room->doors[2].y, room->doors[2].x, "++");
+	mvprintw(room->doors[3].y, room->doors[3].x, "++");
 	return 1;	// 1 == Success
 }
