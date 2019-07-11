@@ -13,6 +13,7 @@ int ScreenSetUp();
 int MapSetUp();
 Player * PlayerSetUp();
 int handleInput(int, Player *);
+int CheckPosition(int, int, Player *);
 int playerMove(int, int, Player *);
 
 int main(void) {
@@ -43,24 +44,24 @@ int ScreenSetUp() {
 
 int MapSetUp() {
 	mvprintw(13, 13, "-----------------------");
-	mvprintw(14, 13, "|---------------------|");
-	mvprintw(15, 13, "|---------------------|");
-	mvprintw(16, 13, "|---------------------|");
-	mvprintw(17, 13, "|---------------------|");
+	mvprintw(14, 13, "|.....................|");
+	mvprintw(15, 13, "|.....................|");
+	mvprintw(16, 13, "|.....................|");
+	mvprintw(17, 13, "|.....................|");
 	mvprintw(18, 13, "-----------------------");
 
 	mvprintw(13, 50, "-----------------------");
-	mvprintw(14, 50, "|---------------------|");
-	mvprintw(15, 50, "|---------------------|");
-	mvprintw(16, 50, "|---------------------|");
-	mvprintw(17, 50, "|---------------------|");
+	mvprintw(14, 50, "|.....................|");
+	mvprintw(15, 50, "|.....................|");
+	mvprintw(16, 50, "|.....................|");
+	mvprintw(17, 50, "|.....................|");
 	mvprintw(18, 50, "-----------------------");
 
 	mvprintw(2, 20, "-----------------------");
-	mvprintw(3, 20, "|---------------------|");
-	mvprintw(4, 20, "|---------------------|");
-	mvprintw(5, 20, "|---------------------|");
-	mvprintw(6, 20, "|---------------------|");
+	mvprintw(3, 20, "|.....................|");
+	mvprintw(4, 20, "|.....................|");
+	mvprintw(5, 20, "|.....................|");
+	mvprintw(6, 20, "|.....................|");
 	mvprintw(7, 20, "-----------------------");
 	return 0;
 }
@@ -72,28 +73,44 @@ Player * PlayerSetUp() {
 	newPlayer->xPosition 	= 20;
 	newPlayer->yPosition 	= 15;
 	newPlayer->health		= 20;
-	mvprintw(newPlayer->yPosition, newPlayer->xPosition, "@");
-	move(newPlayer->yPosition, newPlayer->xPosition);	// Curser ;)
+	playerMove(15, 20, newPlayer);
 
 	return newPlayer;
 }
 
 int handleInput(int input, Player * user) {
+	int newX;
+	int newY;
 	if (input == 'w' || input == 'W')	// Move Up
 	{
-		playerMove(user->yPosition - 1, user->xPosition, user);
+		newY 	= user->yPosition - 1;
+		newX	= user->xPosition;
 	}
 	if (input == 's' || input == 'S')	// Move Down
 	{
-		playerMove(user->yPosition + 1, user->xPosition, user);
+		newY 	= user->yPosition + 1;
+		newX	= user->xPosition;
 	}
 	if (input == 'a' || input == 'A')	// Move Left
 	{
-		playerMove(user->yPosition, user->xPosition - 1, user);
+		newY 	= user->yPosition;
+		newX	= user->xPosition - 1;
 	}
 	if (input == 'd' || input == 'D')	// Move Right
 	{
-		playerMove(user->yPosition, user->xPosition + 1, user);
+		newY 	= user->yPosition;
+		newX	= user->xPosition + 1;
+	}
+	CheckPosition(newY, newX, user);
+}
+
+int CheckPosition(int y, int x, Player * user) {
+	if ( mvinch(y, x) == '.' )
+	{
+		playerMove(y, x, user);
+	}
+	else {
+		playerMove(user->yPosition, user->xPosition, user);
 	}
 }
 
