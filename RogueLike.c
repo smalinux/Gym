@@ -14,7 +14,7 @@ typedef struct Room
 	Position position;
 	int height;
 	int width;
-	Position doors[4];
+	Position ** doors;
 	//
 	// Monster ** monsters;		// pointer to array of structs ! i think !!
 	// Item ** items;
@@ -62,6 +62,7 @@ int main(void) {
 
 int ScreenSetUp() {
 	initscr();
+	srand(time(NULL));		// What this MEAM ?!
 	noecho();
 
 	return 1;	// 1 == Succes & 0 == failure !!
@@ -91,20 +92,30 @@ Room * createRoom(int y, int x, int height, int width ) {
 	newRoom->position.x		= x;
 	newRoom->height			= height;
 	newRoom->width			= width;
-	//
-	srand(time(NULL));
+
+	newRoom->doors			= malloc(sizeof(Position) * 4);
+
+	// Doors ..
+
 	/* Top door */
-	newRoom->doors[0].x 		= rand() % width + newRoom->position.x;
-	newRoom->doors[0].y 		= newRoom->position.y;
+	newRoom->doors[0]			= malloc(sizeof(Position));
+	newRoom->doors[0]->x 		= rand() % (width -2) + newRoom->position.x +1;
+	newRoom->doors[0]->y 		= newRoom->position.y;
+
 	/* Bottom door */
-	newRoom->doors[0].x 		= rand() % width + newRoom->position.x;
-	newRoom->doors[0].y 		= newRoom->position.y + newRoom->height;
+	newRoom->doors[1]			= malloc(sizeof(Position));
+	newRoom->doors[1]->x 		= rand() % (width -2) + newRoom->position.x +1;
+	newRoom->doors[1]->y 		= newRoom->position.y + newRoom->height;
+
 	/* Left door */
-	newRoom->doors[0].x 		= newRoom->position.x;
-	newRoom->doors[0].y 		= rand() % height + newRoom->position.y;
+	newRoom->doors[2]			= malloc(sizeof(Position));
+	newRoom->doors[2]->x 		= newRoom->position.x;
+	newRoom->doors[2]->y 		= rand() % (height -2) + newRoom->position.y +1;
+
 	/* Right door */
-	newRoom->doors[0].x 		= newRoom->position.x + width;
-	newRoom->doors[0].y 		= rand() % height + newRoom->position.y;
+	newRoom->doors[3]			= malloc(sizeof(Position));
+	newRoom->doors[3]->x 		= newRoom->position.x + width -1;
+	newRoom->doors[3]->y 		= rand() % (height -2) + newRoom->position.y +1;
 
 	return newRoom;
 }
@@ -187,9 +198,9 @@ int drawRoom(Room * room) {
 		}
 	}
 	/* Draw doors */
-	mvprintw(room->doors[0].y, room->doors[0].x, "++");
-	mvprintw(room->doors[1].y, room->doors[1].x, "++");
-	mvprintw(room->doors[2].y, room->doors[2].x, "++");
-	mvprintw(room->doors[3].y, room->doors[3].x, "++");
+	mvprintw(room->doors[0]->y, room->doors[0]->x, "+");
+	mvprintw(room->doors[1]->y, room->doors[1]->x, "+");
+	mvprintw(room->doors[2]->y, room->doors[2]->x, "+");
+	mvprintw(room->doors[3]->y, room->doors[3]->x, "+");
 	return 1;	// 1 == Success
 }
