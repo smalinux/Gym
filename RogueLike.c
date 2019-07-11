@@ -12,6 +12,8 @@ typedef struct Player
 int ScreenSetUp();
 int MapSetUp();
 Player * PlayerSetUp();
+int handleInput(int, Player *);
+int playerMove(int, int, Player *);
 
 int main(void) {
 	int ch;
@@ -21,8 +23,9 @@ int main(void) {
 	MapSetUp();
 	user = PlayerSetUp();
 
+	/* Main Game Loop */
 	while( (ch = getch()) != 'q' ) {
-
+		handleInput(ch, user);
 	}
 
 
@@ -35,7 +38,7 @@ int ScreenSetUp() {
 	initscr();
 	noecho();
 
-	return 0;
+	return 1;	// 1 == Succes & 0 == failure !!
 }
 
 int MapSetUp() {
@@ -73,4 +76,31 @@ Player * PlayerSetUp() {
 	move(newPlayer->yPosition, newPlayer->xPosition);	// Curser ;)
 
 	return newPlayer;
+}
+
+int handleInput(int input, Player * user) {
+	if (input == 'w' || input == 'W')	// Move Up
+	{
+		playerMove(user->yPosition - 1, user->xPosition, user);
+	}
+	if (input == 's' || input == 'S')	// Move Down
+	{
+		playerMove(user->yPosition + 1, user->xPosition, user);
+	}
+	if (input == 'a' || input == 'A')	// Move Left
+	{
+		playerMove(user->yPosition, user->xPosition - 1, user);
+	}
+	if (input == 'd' || input == 'D')	// Move Right
+	{
+		playerMove(user->yPosition, user->xPosition + 1, user);
+	}
+}
+
+int playerMove(int y, int x,Player * user) {
+	mvprintw(user->yPosition, user->xPosition, ".");	// Change Prev
+	user->xPosition 	= x;
+	user->yPosition 	= y;
+	mvprintw(user->yPosition, user->xPosition, "@");	// Update knew
+	move(user->yPosition, user->xPosition);
 }
