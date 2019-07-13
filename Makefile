@@ -1,9 +1,12 @@
-tempHeaders =
+noheaders=
 
 ###### GitHub commiting ..
 # https://help.github.com/en/articles/adding-a-file-to-a-repository-using-the-command-line
 # 
 # 
+
+x:
+
 git:
 	git add .
 	git commit -m "test .."
@@ -14,4 +17,4 @@ git:
 	git push origin master
 
 make:
-	gcc temp.c -o $(tempHeaders) temp -std=c99
+	gcc RogueLike.c -o $(noheaders) RogueLike.o -lncurses -std=c99
