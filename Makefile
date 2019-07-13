@@ -1,5 +1,9 @@
 tempHeaders =
 
+###### GitHub commiting ..
+# https://help.github.com/en/articles/adding-a-file-to-a-repository-using-the-command-line
+# 
+# 
 git:
 	git add .
 	git commit -m "test .."
