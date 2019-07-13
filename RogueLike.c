@@ -2,7 +2,7 @@
 #include "ncurses.h"
 #include "time.h"
 
-// test 4
+// test 5
 
 typedef struct Position
 {
