@@ -5,16 +5,15 @@ noheaders=
 # 
 # 
 
-x:
+make:
+	gcc RogueLike.c -o $(noheaders) RogueLike.o -lncurses -std=c99
 
 git:
 	git add .
-	git commit -m "test .."
+	git commit -m "test .." -m "Description ..........\SecndLine..";
 	git checkout master
 	git fetch origin master
 	git rebase -i origin/master
 	# Squash commits, fix up commit messages etc.
 	git push origin master
 
-make:
-	gcc RogueLike.c -o $(noheaders) RogueLike.o -lncurses -std=c99
