@@ -215,40 +215,51 @@ int drawRoom(Room * room) {
 int connectDoors(Position * doorOne, Position * doorTwo) {
 
 	Position temp;
+	Position prev;
 
 	temp.x 		= doorOne->x;
 	temp.y 		= doorOne->y;
+	
+	int count 	= 0;
+
+	prev 		= temp;
 
 	while(1) {
 		// Move Left
 		if (abs( (temp.x -1) - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && mvinch(temp.y, temp.x -1) == ' ')
 		{
-			mvprintw(temp.y, temp.x-1, "#");
+			prev.x 	= temp.x;
 			temp.x 	= temp.x -1;
 		}
 		// Move Right
 		else if (abs( temp.x +1 - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && mvinch(temp.y, temp.x +1) == ' ')
 		{
-			mvprintw(temp.y, temp.x+1, "#");
+			prev.x 	= temp.x;
 			temp.x 	= temp.x +1;
 		}
 		// Move down
 		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && mvinch(temp.y +1, temp.x) == ' ')
 		{
-			mvprintw(temp.y+1, temp.x, "#");
+			prev.x 	= temp.x;
 			temp.y 	= temp.y +1;
 		}
 		// Move up
 		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && mvinch(temp.y -1, temp.x) == ' ')
 		{
-			mvprintw(temp.y+1, temp.x, "#");
+			prev.x 	= temp.x;
 			temp.y 	= temp.y +1;
 		}
 		else
 		{
-			mvprintw(0, 0, "################");
-			return 0;
+			if( count == 0) {
+				temp = prev;
+				count++;
+				continue;
+			} else {
+				return 0;
+			}
 		}
+		mvprintw(temp.y, temp.x, "#");
 		getch();			// ROMOVE ME !!!!!!!!
 	}
 
