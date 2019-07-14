@@ -10,7 +10,7 @@ make:
 
 git:
 	git add .
-	git commit -m "test .."
+	git commit -m "$m"
 	git checkout master
 	git fetch origin master
 	git rebase -i origin/master
