@@ -1,4 +1,4 @@
-noheaders=
+headers=  -lncurses -lpanel -lform -lmenu
 
 ###### GitHub commiting ..
 # https://help.github.com/en/articles/adding-a-file-to-a-repository-using-the-command-line
@@ -6,7 +6,8 @@ noheaders=
 # 
 
 make:
-	gcc RogueLike.c -o $(noheaders) RogueLike.o -lncurses -std=c99
+# 	gcc RogueLike.c -o $(headers) RogueLike.o -lncurses -std=c99
+	gcc -o Ncurses.o Ncurses.c $(headers) -std=c99
 
 git:
 	git add .
