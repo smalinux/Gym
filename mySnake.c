@@ -74,26 +74,6 @@ int mainLoop(Snake * snake) {
 				break;
 		}
 		drawSnake(position, snake);
-
-		// if (ch == 'w') {
-		// 	position.y 						= snake->position.y 		- 1;
-		// 	mvprintw(0,0,"%i \t %i", position.y, position.x);
-		// 	drawSnake(position, snake);
-		// } else if (ch == 's') {
-		// 	position.y 						= snake->position.y 		+ 1;
-		// 	mvprintw(0,0,"%i \t %i", position.y, position.x);
-		// 	drawSnake(position, snake);
-		// } else if (ch == 'a') {
-		// 	position.x 						= snake->position.x 		- 1;
-		// 	mvprintw(0,0,"%i \t %i", position.y, position.x);
-		// 	drawSnake(position, snake);
-		// } else if (ch == 'd') {
-		// 	position.x 						= snake->position.x 		+ 1;
-		// 	mvprintw(0,0,"%i \t %i", position.y, position.x);
-		// 	drawSnake(position, snake);
-		// }
-		//
-		// mvprintw(0,0,"%i \t %i", position.y, position.x);
 	}
 
 	return 1;

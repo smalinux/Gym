@@ -1,3 +1,4 @@
+// TODO : comment & describe every function
 #include "stdlib.h"
 #include "ncurses.h"
 #include "time.h"
@@ -264,3 +265,11 @@ int connectDoors(Position * doorOne, Position * doorTwo) {
 
 	return 1;	// 1 == Success
 }
+
+/**
+Master Function!
+This func saves every single locaiton in 2D array
+*/
+// char ** saveLevelPositions() {
+
+// }
