@@ -8,13 +8,5 @@ headers=  -lncurses -lpanel -lform -lmenu
 make:
 	gcc -o RogueLike.o RogueLike.c $(headers) -std=c99
 	gcc -o Ncurses.o Ncurses.c $(headers) -std=c99
-
-git:
-	git add .
-	git commit -m "$m"
-	git checkout master
-	git fetch origin master
-	git rebase -i origin/master
-	# Squash commits, fix up commit messages etc.
-	git push origin master
+	gcc -o mySnake.o mySnake.c $(headers) -std=c99
 

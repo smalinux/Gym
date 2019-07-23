@@ -132,7 +132,7 @@ Player * PlayerSetUp() {
 
 	newPlayer->position.x 	= 20;
 	newPlayer->position.y 	= 15;
-	newPlayer->health		= 20;
+	newPlayer->health		= 20;		// = Useless till now!
 	playerMove(15, 20, newPlayer);
 
 	return newPlayer;
@@ -259,7 +259,7 @@ int connectDoors(Position * doorOne, Position * doorTwo) {
 			}
 		}
 		mvprintw(temp.y, temp.x, "#");
-		getch();			// ROMOVE ME !!!!!!!!
+		// getch();			// REMOVE ME !!!!!!!!
 	}
 
 	return 1;	// 1 == Success
