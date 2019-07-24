@@ -1,3 +1,4 @@
+// TODO : Clean el code , el spaces, al tabs, naming, commenting, 
 // TODO : Separate code to files at the end of project
 // TODO : comment & describe every function
 #include "stdlib.h"
@@ -6,7 +7,7 @@
 
 typedef struct Level
 {
-	int level;
+	int level;	// bad naming! i'll change this at the end of tut. TODO
 	char ** tiles;
 	int numberOfRooms;
 	struct Room ** rooms;
@@ -36,21 +37,41 @@ typedef struct Player
 	// Room * room;
 } Player;
 
+typedef struct Monster
+{
+	char symbol;
+	int health;
+	int attack;
+	int speed;
+	int defence;
+	int pathfinding;
+	Position position;
+} Monster;
+
 
 int ScreenSetUp();
 Level * createLevel(int level);
+
 /* Level/map functions */
 Room ** roomsSetUp();		// returns pointer to 2D array : master array
 char ** saveLevelPositions();
+
 /*  */
 Player * PlayerSetUp();
 Position * handleInput(int input, Player * user);
 int CheckPosition(Position * newPosition, Player * user, char ** level);
 int playerMove(Position * newPosition, Player * user, char ** level);
+
 /* Room functions */
 Room * createRoom(int y, int x, int height, int width );
 int drawRoom(Room * room);
 int connectDoors(Position * doorOne, Position * doorTwo);
+
+/* Monster Functions */
+int addMonsters(Level * level);
+Monster * selectMonster(int level);
+Monster * createMonster(char symbol, int health, int attack, int speed, int defence, int pathfinding);
+int setStartingPosition(Monster * monster, Room * room);
 
 
 // -----------------------------------------------------------------------------------
@@ -92,6 +113,8 @@ Level * createLevel(int level) {
 	newLevel->numberOfRooms 	= 3;	// hardcoded
 	newLevel->rooms 			= roomsSetUp();
 	newLevel->tiles				= saveLevelPositions();
+
+	addMonsters(newLevel);
 
 	return newLevel;
 }
@@ -208,7 +231,7 @@ int CheckPosition(Position * newPosition, Player * user, char ** level) {
 
 int playerMove(Position * newPosition,Player * user, char ** level) {
 	char buffer[8];
-	sprintf(buffer, "%c", level[user->position.y][user->position.x]);	// convert single char to string of char
+	sprintf(buffer, "%c", level[user->position.y][user->position.x]);	// convert single char to string of char, TODO: Google it!
 
 	mvprintw(user->position.y, user->position.x, buffer);	// Change Prev
 	user->position.y 	= newPosition->y;
@@ -320,3 +343,122 @@ char ** saveLevelPositions() {
 	}
 	return positions;
 }
+
+// Start Monsters
+// -----------------------------------------------------------------------------------
+/*
+1 Spider
+	Symbol: X
+	levels: 1 to 3
+	health: 2
+	Attacks: 1
+	defence: 1
+	pathfinding: 1 (1 == random)
+
+2 Goblin
+	Symbol: G
+	levels: 1 to 5
+	health: 5
+	Attacks: 3
+	defence: 1
+	pathfinding: 2 (2 == Move closer to the player) ("Seeking")
+	
+3 Troll
+	Symbol: T
+	levels: 4 to 6
+	health: 15
+	Attacks: 1
+	defence: 1
+	pathfinding: 1 (random)
+*/
+
+int addMonsters(Level * level) {
+	int x;
+	level->numberOfMonsters = 0;
+
+	level->monsters = malloc(sizeof(Monster *) * 6);	// max num of rooms is 6, so ..
+	for (x = 0; x < level->numberOfRooms; ++x)
+	{
+		if ( (rand() % 2) == 0 )
+		{
+			level->monsters[level->numberOfMonsters] = selectMonster(level->level);
+			setStartingPosition(level->monsters[level->numberOfMonsters], level->rooms[x]);
+			++level->numberOfMonsters;
+		}
+	}
+	return 1;
+}
+
+Monster * selectMonster(int level) {
+	int monster;
+
+	switch(level) {
+		case 1:
+		case 2:
+		case 3:
+			monster = (rand() % 2) + 1;
+			break;
+		case 4:
+		case 5:
+			monster = (rand() % 2) + 2;
+			break;
+		case 6:
+			monster = 3;
+			break;
+	}
+	// ---------------
+	switch(monster) {
+		case 1: /* Spider */
+			return createMonster('X', 2, 1, 1, 1, 1);
+		case 2: /* Goblin */
+			return createMonster('G', 5, 3, 1, 1, 2);
+		case 3: /* Troll */
+			return createMonster('T', 15, 5, 1, 1, 1);
+	}
+}
+
+Monster * createMonster(char symbol, int health, int attack, int speed, int defence, int pathfinding) {
+	Monster * newMonster;
+	newMonster = malloc(sizeof(Monster));
+
+	newMonster->symbol 		= symbol;
+	newMonster->health 		= health;
+	newMonster->attack 		= attack;
+	newMonster->speed 		= speed;
+	newMonster->defence 	= defence;
+	newMonster->symbol 		= pathfinding;
+
+	return newMonster;
+}
+
+/*
+	---------
+	|		
+	|.....  |
+	|		|
+	---------
+
+*/
+
+int setStartingPosition(Monster * monster, Room * room) {
+	char buffer[8];
+	
+	monster->position.y 	= (rand() % (room->height -2)) + room->position.y +1;
+	monster->position.x 	= (rand() % (room->width -2)) + room->position.x +1;
+
+	sprintf(buffer, "%c", monster->symbol);
+
+	mvprintw(monster->position.y, monster->position.x, buffer);
+	return 1;
+}
+
+// End Monsters
+// -----------------------------------------------------------------------------------
+
+/*
+
+createLevel() {
+	addMonsters() {}
+}
+
+*/
