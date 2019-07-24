@@ -1,3 +1,4 @@
+// TODO : Separate code to files at the end of project
 // TODO : comment & describe every function
 #include "stdlib.h"
 #include "ncurses.h"
@@ -30,11 +31,14 @@ typedef struct Player
 
 
 int ScreenSetUp();
-Room ** MapSetUp();		// returns array of struct ; )
+/* Level/map functions */
+Room ** MapSetUp();		// returns pointer to 2D array : master array
+char ** saveLevelPositions();
+/*  */
 Player * PlayerSetUp();
-int handleInput(int, Player *);
-int CheckPosition(int, int, Player *);
-int playerMove(int, int, Player *);
+Position * handleInput(int input, Player * user);
+int CheckPosition(Position * newPosition, Player * user, char ** level);
+int playerMove(Position * newPosition, Player * user, char ** level);
 /* Room functions */
 Room * createRoom(int y, int x, int height, int width );
 int drawRoom(Room * room);
@@ -45,14 +49,18 @@ int connectDoors(Position * doorOne, Position * doorTwo);
 int main(void) {
 	int ch;
 	Player * user;
+	char ** level;
+	Position * newPosition;
 
 	ScreenSetUp();
 	MapSetUp();
+	level = saveLevelPositions();
 	user = PlayerSetUp();
 
 	/* Main Game Loop */
 	while( (ch = getch()) != 'q' ) {
-		handleInput(ch, user);
+		newPosition = handleInput(ch, user);
+		CheckPosition(newPosition, user, level);
 	}
 
 
@@ -134,53 +142,62 @@ Player * PlayerSetUp() {
 	newPlayer->position.x 	= 20;
 	newPlayer->position.y 	= 15;
 	newPlayer->health		= 20;		// = Useless till now!
-	playerMove(15, 20, newPlayer);
+	mvprintw(15, 20, "@");	// Update knew
+	move(15, 20);
 
 	return newPlayer;
 }
 
-int handleInput(int input, Player * user) {
-	int newX;
-	int newY;
+Position * handleInput(int input, Player * user) {
+	Position * newPosition;
+	newPosition = malloc(sizeof(Position));
+	
 	if (input == 'w' || input == 'W')	// Move Up
 	{
-		newY 	= user->position.y - 1;
-		newX	= user->position.x;
+		newPosition->y 	= user->position.y - 1;
+		newPosition->x	= user->position.x;
 	}
 	if (input == 's' || input == 'S')	// Move Down
 	{
-		newY 	= user->position.y + 1;
-		newX	= user->position.x;
+		newPosition->y 	= user->position.y + 1;
+		newPosition->x	= user->position.x;
 	}
 	if (input == 'a' || input == 'A')	// Move Left
 	{
-		newY 	= user->position.y;
-		newX	= user->position.x - 1;
+		newPosition->y 	= user->position.y;
+		newPosition->x	= user->position.x - 1;
 	}
 	if (input == 'd' || input == 'D')	// Move Right
 	{
-		newY 	= user->position.y;
-		newX	= user->position.x + 1;
+		newPosition->y 	= user->position.y;
+		newPosition->x	= user->position.x + 1;
 	}
-	CheckPosition(newY, newX, user);
+	return newPosition;
 }
 
-int CheckPosition(int y, int x, Player * user) {
-	if ( mvinch(y, x) == '.' || mvinch(y, x) == '+' || mvinch(y, x) == '#' )
+int CheckPosition(Position * newPosition, Player * user, char ** level) {
+	if ( mvinch(newPosition->y, newPosition->x) == '.' 	|| 
+		mvinch(newPosition->y, newPosition->x) == '+' 	|| 
+		mvinch(newPosition->y, newPosition->x) == '#' )
 	{
-		playerMove(y, x, user);
+		playerMove(newPosition, user, level);
 	}
 	else {
-		playerMove(user->position.y, user->position.x, user);
+		move(user->position.y, user->position.x + 0);
 	}
+	return 1;
 }
 
-int playerMove(int y, int x,Player * user) {
-	mvprintw(user->position.y, user->position.x, ".");	// Change Prev
-	user->position.x 	= x;
-	user->position.y 	= y;
+int playerMove(Position * newPosition,Player * user, char ** level) {
+	char buffer[8];
+	sprintf(buffer, "%c", level[user->position.y][user->position.x]);	// convert single char to string of char
+
+	mvprintw(user->position.y, user->position.x, buffer);	// Change Prev
+	user->position.y 	= newPosition->y;
+	user->position.x 	= newPosition->x;
 	mvprintw(user->position.y, user->position.x, "@");	// Update knew
 	move(user->position.y, user->position.x);
+	return 1;
 }
 
 int drawRoom(Room * room) {
@@ -270,6 +287,18 @@ int connectDoors(Position * doorOne, Position * doorTwo) {
 Master Function!
 This func saves every single locaiton in 2D array
 */
-// char ** saveLevelPositions() {
+char ** saveLevelPositions() {
+	int y, x;
+	char ** positions;
+	positions = malloc(sizeof(char *) * 25);
 
-// }
+	for (int y = 0; y < 25; ++y)
+	{
+		positions[y] = malloc(sizeof(char)*100);
+		for (x = 0; x < 100; ++x)
+		{
+			positions[y][x] = mvinch(y, x);
+		}
+	}
+	return positions;
+}

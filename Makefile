@@ -5,8 +5,10 @@ headers=  -lncurses -lpanel -lform -lmenu
 # 
 # 
 
-make:
+all:
 	gcc -o RogueLike.o RogueLike.c $(headers) -std=c99
 	gcc -o Ncurses.o Ncurses.c $(headers) -std=c99
 	gcc -o mySnake.o mySnake.c $(headers) -std=c99
 
+clean:
+	rm *.o
