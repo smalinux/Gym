@@ -4,6 +4,16 @@
 #include "ncurses.h"
 #include "time.h"
 
+typedef struct Level
+{
+	int level;
+	char ** tiles;
+	int numberOfRooms;
+	struct Room ** rooms;
+	struct Monster ** monsters;
+	int numberOfMonsters;
+} Level;
+
 typedef struct Position
 {
 	int y;
@@ -17,9 +27,6 @@ typedef struct Room
 	int height;
 	int width;
 	Position ** doors;
-	//
-	// Monster ** monsters;		// pointer to array of structs ! i think !!
-	// Item ** items;
 } Room;
 
 typedef struct Player
@@ -31,8 +38,9 @@ typedef struct Player
 
 
 int ScreenSetUp();
+Level * createLevel(int level);
 /* Level/map functions */
-Room ** MapSetUp();		// returns pointer to 2D array : master array
+Room ** roomsSetUp();		// returns pointer to 2D array : master array
 char ** saveLevelPositions();
 /*  */
 Player * PlayerSetUp();
@@ -49,20 +57,18 @@ int connectDoors(Position * doorOne, Position * doorTwo);
 int main(void) {
 	int ch;
 	Player * user;
-	char ** level;
+	Level * level;
 	Position * newPosition;
 
 	ScreenSetUp();
-	MapSetUp();
-	level = saveLevelPositions();
+	level = createLevel(1);
 	user = PlayerSetUp();
 
 	/* Main Game Loop */
 	while( (ch = getch()) != 'q' ) {
 		newPosition = handleInput(ch, user);
-		CheckPosition(newPosition, user, level);
+		CheckPosition(newPosition, user, level->tiles);
 	}
-
 
 	refresh();
 	endwin();
@@ -78,7 +84,19 @@ int ScreenSetUp() {
 	return 1;	// 1 == Succes & 0 == failure !!
 }
 
-Room ** MapSetUp() {		// Array of structs
+Level * createLevel(int level) {
+	Level * newLevel;
+	newLevel = malloc(sizeof(Level));
+
+	newLevel->level 			= level;
+	newLevel->numberOfRooms 	= 3;	// hardcoded
+	newLevel->rooms 			= roomsSetUp();
+	newLevel->tiles				= saveLevelPositions();
+
+	return newLevel;
+}
+
+Room ** roomsSetUp() {		// Array of structs
 	Room ** rooms;			// Create array of room! very simple xD
 	rooms	= malloc(sizeof(Room) * 6);
 
@@ -183,7 +201,7 @@ int CheckPosition(Position * newPosition, Player * user, char ** level) {
 		playerMove(newPosition, user, level);
 	}
 	else {
-		move(user->position.y, user->position.x + 0);
+		move(user->position.y, user->position.x);
 	}
 	return 1;
 }
