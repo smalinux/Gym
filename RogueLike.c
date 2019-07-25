@@ -76,6 +76,7 @@ Monster * createMonster(char symbol, int health, int attack, int speed, int defe
 int setStartingPosition(Monster * monster, Room * room);
 int moveMonsters(Level * level);
 int pathfindingSeek(Position * start, Position * destination);
+int pathfindingRandom(Position * position);
 
 
 // -----------------------------------------------------------------------------------
@@ -467,15 +468,17 @@ int moveMonsters(Level * level) {
 	int i;
 	for (i = 0; i < level->numberOfMonsters; ++i)
 	{
-		if (level->monsters[i]->pathfinding == 1)
+		mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, ".");
+		if (level->monsters[i]->pathfinding == 0)
 		{
 			/* random pathfinding */
+			pathfindingRandom(level->monsters[i]->position);
 		} else {
 			/* seek pathfinding */
-			mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, ".");
+			
 			pathfindingSeek(level->monsters[i]->position, level->user->position);
-			mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, level->monsters[i]->string);
 		}
+		mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, level->monsters[i]->string);
 	}
 }
 
@@ -486,7 +489,54 @@ pathfinding types:
 */
 
 /**
-Seek
+Random pathfinding
+*/
+int pathfindingRandom(Position * position) {
+	int random;
+
+	random = rand() % 5;
+	switch(random) {
+		/* Step UP */
+		case 0:
+			if ( mvinch(position->y -1, position->x) == '.' )
+			{
+				position->y 	= position->y -1;
+			}
+			break;
+
+		/* Step Down */
+		case 1:
+			if ( mvinch(position->y +1, position->x) == '.' )
+			{
+				position->y 	= position->y +1;
+			}
+			break;
+
+		/* Step Left */
+		case 2:
+			if ( mvinch(position->y, position->x -1) == '.' )
+			{
+				position->x 	= position->x -1;
+			}
+			break;
+
+		/* Step Right */
+		case 3:
+			if ( mvinch(position->y, position->x +1) == '.' )
+			{
+				position->x 	= position->x +1;
+			}
+			break;
+
+		/* Do Nothing */
+		case 4:
+			break;
+	}
+	return 1;
+}
+
+/**
+Seek pathfinding
 */
 int pathfindingSeek(Position * start, Position * destination) {
 	// Move Left
