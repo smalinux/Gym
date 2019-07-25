@@ -35,6 +35,10 @@ typedef struct Player
 {
 	Position * position;
 	int health;
+	int attack;
+	int gold;
+	int maxHealth;
+	int exp;
 	// Room * room;
 } Player;
 
@@ -48,10 +52,13 @@ typedef struct Monster
 	int defence;
 	int pathfinding;
 	Position * position;
+	int alive;
 } Monster;
 
-
+/* Screen SetUp */
 int ScreenSetUp();
+int printGameHub(Level * level);
+
 Level * createLevel(int level);
 
 /* Level/map functions */
@@ -61,7 +68,7 @@ char ** saveLevelPositions();
 /*  */
 Player * PlayerSetUp();
 Position * handleInput(int input, Player * user);
-int CheckPosition(Position * newPosition, Player * user, char ** level);
+int CheckPosition(Position * newPosition, Level * level);
 int playerMove(Position * newPosition, Player * user, char ** level);
 
 /* Room functions */
@@ -73,10 +80,14 @@ int connectDoors(Position * doorOne, Position * doorTwo);
 int addMonsters(Level * level);
 Monster * selectMonster(int level);
 Monster * createMonster(char symbol, int health, int attack, int speed, int defence, int pathfinding);
+int killMonster(Monster * monster);
 int setStartingPosition(Monster * monster, Room * room);
 int moveMonsters(Level * level);
 int pathfindingSeek(Position * start, Position * destination);
 int pathfindingRandom(Position * position);
+Monster * getMonsterAt(Position * position, Monster ** monsters);
+
+int combat(Player * player, Monster * monster, int order);
 
 
 // -----------------------------------------------------------------------------------
@@ -87,11 +98,13 @@ int main(void) {
 
 	ScreenSetUp();
 	level = createLevel(1);
+	printGameHub(level);
 
 	/* Main Game Loop */
 	while( (ch = getch()) != 'q' ) {
+		printGameHub(level);
 		newPosition = handleInput(ch, level->user);
-		CheckPosition(newPosition, level->user, level->tiles);
+		CheckPosition(newPosition, level);
 		moveMonsters(level);
 		move(level->user->position->y, level->user->position->x);
 	}
@@ -102,6 +115,8 @@ int main(void) {
 }
 // -----------------------------------------------------------------------------------
 
+// Start Screen SetUP
+// -----------------------------------------------------------------------------------
 int ScreenSetUp() {
 	initscr();
 	srand(time(NULL));		// What this MEAM ?!
@@ -109,6 +124,18 @@ int ScreenSetUp() {
 
 	return 1;	// 1 == Succes & 0 == failure !!
 }
+
+int printGameHub(Level * level) {
+	mvprintw(30, 0, "Level: %d,\t", level->level);
+	printw("Gold: %d,\t", level->user->gold);
+	printw("Hp: %d(%d),\t", level->user->health, level->user->maxHealth);
+	printw("Attack: %d,\t", level->user->attack);
+	printw("Exp: %d,\t", level->user->exp);
+	return 1;
+}
+
+// End Screen SetUP
+// -----------------------------------------------------------------------------------
 
 Level * createLevel(int level) {
 	Level * newLevel;
@@ -188,6 +215,12 @@ Player * PlayerSetUp() {
 
 	newPlayer->position->x 	= 20;
 	newPlayer->position->y 	= 15;
+	newPlayer->attack 		= 1;
+	newPlayer->gold 		= 0;
+	newPlayer->health 		= 0;
+	newPlayer->maxHealth 	= 20;
+	newPlayer->exp 			= 0;
+
 	// newPlayer->health		= 20;		// = Useless till now!
 	mvprintw(newPlayer->position->y, newPlayer->position->x, "@");	// Update knew
 	move(newPlayer->position->y, newPlayer->position->x);
@@ -222,14 +255,19 @@ Position * handleInput(int input, Player * user) {
 	return newPosition;
 }
 
-int CheckPosition(Position * newPosition, Player * user, char ** level) {
+int CheckPosition(Position * newPosition, Level * level) {
+	Player * user;
+	user = level->user;
 	if ( mvinch(newPosition->y, newPosition->x) == '.' 	|| 
 		mvinch(newPosition->y, newPosition->x) == '+' 	|| 
 		mvinch(newPosition->y, newPosition->x) == '#' )
 	{
-		playerMove(newPosition, user, level);
-	}
-	else {
+		playerMove(newPosition, user, level->tiles);
+	} else if (mvinch(newPosition->y, newPosition->x) == 'X' 	|| 
+		mvinch(newPosition->y, newPosition->x) == 'G' 	|| 
+		mvinch(newPosition->y, newPosition->x) == 'T' ) {
+		combat(user, getMonsterAt(newPosition, level->monsters), 1);
+	} else {
 		move(user->position->y, user->position->x);
 	}
 	return 1;
@@ -437,10 +475,17 @@ Monster * createMonster(char symbol, int health, int attack, int speed, int defe
 	newMonster->speed 		= speed;
 	newMonster->defence 	= defence;
 	newMonster->symbol 		= pathfinding;
+	newMonster->alive 		= 1;
 
 	sprintf(newMonster->string, "%c", symbol);
 
 	return newMonster;
+}
+
+int killMonster(Monster * monster) {
+	mvprintw(monster->position->y, monster->position->x, ".");
+	monster->alive 		= 0;
+	return 1;
 }
 
 /*
@@ -468,6 +513,10 @@ int moveMonsters(Level * level) {
 	int i;
 	for (i = 0; i < level->numberOfMonsters; ++i)
 	{
+		if(level->monsters[i]->alive == 0) { // monister is alive ?
+			continue;
+		}
+
 		mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, ".");
 		if (level->monsters[i]->pathfinding == 2)
 		{
@@ -569,7 +618,42 @@ int pathfindingSeek(Position * start, Position * destination) {
 
 // Start Combat
 // -----------------------------------------------------------------------------------
+int combat(Player * player, Monster * monster, int order) {
+	/* Player attacking */
+	if ( order == 1 )
+	{
+		monster->health -= player->attack;
+		if ( monster->health > 0 )
+		{
+			player->health -= monster->attack;
+		} else {
+			killMonster(monster);
+			++player->exp;		// the beauty of syntax
+		}
+	}
+	/* Monster attacking */
+	else {
+		player->health -= monster->attack;
+		if ( player->health > 0 )
+		{
+			monster->health -= player->attack;
+		}
+	}
 
+	return 1;
+}
+
+Monster * getMonsterAt(Position * position, Monster ** monsters) {
+	int i;
+	for (i = 0; i < 6; ++i)
+	{
+		if ( (position->y == monsters[i]->position->y) && (position->x == monsters[i]->position->x) )
+		{
+			return monsters[i];
+		}
+	}
+	return NULL;
+}
 
 // End Combat
 // -----------------------------------------------------------------------------------
