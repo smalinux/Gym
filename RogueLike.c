@@ -13,6 +13,7 @@ typedef struct Level
 	struct Room ** rooms;
 	struct Monster ** monsters;
 	int numberOfMonsters;
+	struct Player * user;
 } Level;
 
 typedef struct Position
@@ -39,6 +40,7 @@ typedef struct Player
 
 typedef struct Monster
 {
+	char string[2];
 	char symbol;
 	int health;
 	int attack;
@@ -72,23 +74,25 @@ int addMonsters(Level * level);
 Monster * selectMonster(int level);
 Monster * createMonster(char symbol, int health, int attack, int speed, int defence, int pathfinding);
 int setStartingPosition(Monster * monster, Room * room);
+int moveMonsters(Level * level);
+int pathfindingSeek(Position * start, Position * destination);
 
 
 // -----------------------------------------------------------------------------------
 int main(void) {
 	int ch;
-	Player * user;
 	Level * level;
 	Position * newPosition;
 
 	ScreenSetUp();
 	level = createLevel(1);
-	user = PlayerSetUp();
 
 	/* Main Game Loop */
 	while( (ch = getch()) != 'q' ) {
-		newPosition = handleInput(ch, user);
-		CheckPosition(newPosition, user, level->tiles);
+		newPosition = handleInput(ch, level->user);
+		CheckPosition(newPosition, level->user, level->tiles);
+		moveMonsters(level);
+		move(level->user->position->y, level->user->position->x);
 	}
 
 	refresh();
@@ -113,7 +117,7 @@ Level * createLevel(int level) {
 	newLevel->numberOfRooms 	= 3;	// hardcoded
 	newLevel->rooms 			= roomsSetUp();
 	newLevel->tiles				= saveLevelPositions();
-
+	newLevel->user 				= PlayerSetUp();
 	addMonsters(newLevel);
 
 	return newLevel;
@@ -285,25 +289,29 @@ int connectDoors(Position * doorOne, Position * doorTwo) {
 
 	while(1) {
 		// Move Left
-		if (abs( (temp.x -1) - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && mvinch(temp.y, temp.x -1) == ' ')
+		if (abs( (temp.x -1) - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && 
+			mvinch(temp.y, temp.x -1) == ' ')
 		{
 			prev.x 	= temp.x;
 			temp.x 	= temp.x -1;
 		}
 		// Move Right
-		else if (abs( temp.x +1 - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && mvinch(temp.y, temp.x +1) == ' ')
+		else if (abs( temp.x +1 - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && 
+			mvinch(temp.y, temp.x +1) == ' ')
 		{
 			prev.x 	= temp.x;
 			temp.x 	= temp.x +1;
 		}
 		// Move down
-		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && mvinch(temp.y +1, temp.x) == ' ')
+		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && 
+			mvinch(temp.y +1, temp.x) == ' ')
 		{
 			prev.x 	= temp.x;
 			temp.y 	= temp.y +1;
 		}
 		// Move up
-		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && mvinch(temp.y -1, temp.x) == ' ')
+		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && 
+			mvinch(temp.y -1, temp.x) == ' ')
 		{
 			prev.x 	= temp.x;
 			temp.y 	= temp.y +1;
@@ -429,6 +437,8 @@ Monster * createMonster(char symbol, int health, int attack, int speed, int defe
 	newMonster->defence 	= defence;
 	newMonster->symbol 		= pathfinding;
 
+	sprintf(newMonster->string, "%c", symbol);
+
 	return newMonster;
 }
 
@@ -442,18 +452,73 @@ Monster * createMonster(char symbol, int health, int attack, int speed, int defe
 */
 
 int setStartingPosition(Monster * monster, Room * room) {
-	char buffer[8];
 	monster->position 		= malloc(sizeof(Position));
 	
 	monster->position->y 	= (rand() % (room->height -2)) + room->position.y +1;
 	monster->position->x 	= (rand() % (room->width -2)) + room->position.x +1;
 
-	sprintf(buffer, "%c", monster->symbol);
-
-	mvprintw(monster->position->y, monster->position->x, buffer);
+	mvprintw(monster->position->y, monster->position->x, monster->string);
 	return 1;
 }
 
+/** Loop through all the monsters in the level
+*/
+int moveMonsters(Level * level) {
+	int i;
+	for (i = 0; i < level->numberOfMonsters; ++i)
+	{
+		if (level->monsters[i]->pathfinding == 1)
+		{
+			/* random pathfinding */
+		} else {
+			/* seek pathfinding */
+			mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, ".");
+			pathfindingSeek(level->monsters[i]->position, level->user->position);
+			mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, level->monsters[i]->string);
+		}
+	}
+}
+
+/*
+pathfinding types:
+	Seeking
+	Random
+*/
+
+/**
+Seek
+*/
+int pathfindingSeek(Position * start, Position * destination) {
+	// Move Left
+	if (abs( (start->x -1) - destination->x) < abs( ( start->x) - destination->x) && 
+		mvinch(start->y, start->x -1) == '.')
+	{
+		start->x 	= start->x -1;
+	}
+	// Move Right
+	else if (abs( start->x +1 - destination->x) < abs( ( start->x) - destination->x) && 
+		mvinch(start->y, start->x +1) == '.')
+	{
+		start->x 	= start->x +1;
+	}
+	// Move down
+	else if (abs( (start->y +1) - destination->y) < abs( ( start->y) - destination->y) && 
+		mvinch(start->y +1, start->x) == '.')
+	{
+		start->y 	= start->y +1;
+	}
+	// Move up
+	else if (abs( (start->y +1) - destination->y) < abs( ( start->y) - destination->y) && 
+		mvinch(start->y -1, start->x) == '.')
+	{
+		start->y 	= start->y +1;
+	}
+	else {
+		/* Do nothing */
+	}
+
+	return 1;
+}
 // End Monsters
 // -----------------------------------------------------------------------------------
 
