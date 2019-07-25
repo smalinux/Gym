@@ -445,9 +445,9 @@ Monster * createMonster(char symbol, int health, int attack, int speed, int defe
 
 /*
 	---------
-	|		
-	|.....  |
-	|		|
+	|.......|
+	|.......|
+	|.......|
 	---------
 
 */
@@ -469,14 +469,13 @@ int moveMonsters(Level * level) {
 	for (i = 0; i < level->numberOfMonsters; ++i)
 	{
 		mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, ".");
-		if (level->monsters[i]->pathfinding == 0)
+		if (level->monsters[i]->pathfinding == 2)
 		{
+			/* seek pathfinding */
+			pathfindingSeek(level->monsters[i]->position, level->user->position);
+		} else {
 			/* random pathfinding */
 			pathfindingRandom(level->monsters[i]->position);
-		} else {
-			/* seek pathfinding */
-			
-			pathfindingSeek(level->monsters[i]->position, level->user->position);
 		}
 		mvprintw(level->monsters[i]->position->y, level->monsters[i]->position->x, level->monsters[i]->string);
 	}
@@ -503,7 +502,6 @@ int pathfindingRandom(Position * position) {
 				position->y 	= position->y -1;
 			}
 			break;
-
 		/* Step Down */
 		case 1:
 			if ( mvinch(position->y +1, position->x) == '.' )
@@ -511,7 +509,6 @@ int pathfindingRandom(Position * position) {
 				position->y 	= position->y +1;
 			}
 			break;
-
 		/* Step Left */
 		case 2:
 			if ( mvinch(position->y, position->x -1) == '.' )
@@ -519,7 +516,6 @@ int pathfindingRandom(Position * position) {
 				position->x 	= position->x -1;
 			}
 			break;
-
 		/* Step Right */
 		case 3:
 			if ( mvinch(position->y, position->x +1) == '.' )
@@ -527,7 +523,6 @@ int pathfindingRandom(Position * position) {
 				position->x 	= position->x +1;
 			}
 			break;
-
 		/* Do Nothing */
 		case 4:
 			break;
