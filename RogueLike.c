@@ -32,7 +32,7 @@ typedef struct Room
 
 typedef struct Player
 {
-	Position position;
+	Position * position;
 	int health;
 	// Room * room;
 } Player;
@@ -45,7 +45,7 @@ typedef struct Monster
 	int speed;
 	int defence;
 	int pathfinding;
-	Position position;
+	Position * position;
 } Monster;
 
 
@@ -179,12 +179,13 @@ Room * createRoom(int y, int x, int height, int width ) {
 Player * PlayerSetUp() {
 	Player * newPlayer;
 	newPlayer = malloc(sizeof(Player));
+	newPlayer->position = malloc(sizeof(Position));
 
-	newPlayer->position.x 	= 20;
-	newPlayer->position.y 	= 15;
-	newPlayer->health		= 20;		// = Useless till now!
-	mvprintw(15, 20, "@");	// Update knew
-	move(15, 20);
+	newPlayer->position->x 	= 20;
+	newPlayer->position->y 	= 15;
+	// newPlayer->health		= 20;		// = Useless till now!
+	mvprintw(newPlayer->position->y, newPlayer->position->x, "@");	// Update knew
+	move(newPlayer->position->y, newPlayer->position->x);
 
 	return newPlayer;
 }
@@ -195,23 +196,23 @@ Position * handleInput(int input, Player * user) {
 	
 	if (input == 'w' || input == 'W')	// Move Up
 	{
-		newPosition->y 	= user->position.y - 1;
-		newPosition->x	= user->position.x;
+		newPosition->y 	= user->position->y - 1;
+		newPosition->x	= user->position->x;
 	}
 	if (input == 's' || input == 'S')	// Move Down
 	{
-		newPosition->y 	= user->position.y + 1;
-		newPosition->x	= user->position.x;
+		newPosition->y 	= user->position->y + 1;
+		newPosition->x	= user->position->x;
 	}
 	if (input == 'a' || input == 'A')	// Move Left
 	{
-		newPosition->y 	= user->position.y;
-		newPosition->x	= user->position.x - 1;
+		newPosition->y 	= user->position->y;
+		newPosition->x	= user->position->x - 1;
 	}
 	if (input == 'd' || input == 'D')	// Move Right
 	{
-		newPosition->y 	= user->position.y;
-		newPosition->x	= user->position.x + 1;
+		newPosition->y 	= user->position->y;
+		newPosition->x	= user->position->x + 1;
 	}
 	return newPosition;
 }
@@ -224,20 +225,20 @@ int CheckPosition(Position * newPosition, Player * user, char ** level) {
 		playerMove(newPosition, user, level);
 	}
 	else {
-		move(user->position.y, user->position.x);
+		move(user->position->y, user->position->x);
 	}
 	return 1;
 }
 
 int playerMove(Position * newPosition,Player * user, char ** level) {
 	char buffer[8];
-	sprintf(buffer, "%c", level[user->position.y][user->position.x]);	// convert single char to string of char, TODO: Google it!
+	sprintf(buffer, "%c", level[user->position->y][user->position->x]);	// convert single char to string of char, TODO: Google it!
 
-	mvprintw(user->position.y, user->position.x, buffer);	// Change Prev
-	user->position.y 	= newPosition->y;
-	user->position.x 	= newPosition->x;
-	mvprintw(user->position.y, user->position.x, "@");	// Update knew
-	move(user->position.y, user->position.x);
+	mvprintw(user->position->y, user->position->x, buffer);	// Change Prev
+	user->position->y 	= newPosition->y;
+	user->position->x 	= newPosition->x;
+	mvprintw(user->position->y, user->position->x, "@");	// Update knew
+	move(user->position->y, user->position->x);
 	return 1;
 }
 
@@ -442,13 +443,14 @@ Monster * createMonster(char symbol, int health, int attack, int speed, int defe
 
 int setStartingPosition(Monster * monster, Room * room) {
 	char buffer[8];
+	monster->position 		= malloc(sizeof(Position));
 	
-	monster->position.y 	= (rand() % (room->height -2)) + room->position.y +1;
-	monster->position.x 	= (rand() % (room->width -2)) + room->position.x +1;
+	monster->position->y 	= (rand() % (room->height -2)) + room->position.y +1;
+	monster->position->x 	= (rand() % (room->width -2)) + room->position.x +1;
 
 	sprintf(buffer, "%c", monster->symbol);
 
-	mvprintw(monster->position.y, monster->position.x, buffer);
+	mvprintw(monster->position->y, monster->position->x, buffer);
 	return 1;
 }
 
