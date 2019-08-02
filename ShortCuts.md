@@ -17,6 +17,8 @@ Vp	# selsct line & paste
 20G	# move curser to line 20
 
 
+Ctrl Alt T    >> Open terminal
+
 
 
 
