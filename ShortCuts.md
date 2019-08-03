@@ -18,6 +18,7 @@ Vp	# selsct line & paste
 
 
 Ctrl Alt T    >> Open terminal
+eog		<!-- Eye of GNOME !! -->
 
 
 
