@@ -47,7 +47,8 @@ void read_png_file(char * file_name) {
 
   /* initialize stuff */
   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-
+  png_set_expand_gray_1_2_4_to_8(png_ptr);
+  
   if (!png_ptr)
     abort_("[read_png_file] png_create_read_struct failed");
 
@@ -136,6 +137,7 @@ void write_png_file(char * file_name) {
 }
 
 void process_file(void) {
+
   if (png_get_color_type(png_ptr, info_ptr) == PNG_COLOR_TYPE_RGB)
     abort_("[process_file] input file is PNG_COLOR_TYPE_RGB but must be PNG_COLOR_TYPE_RGBA "
       "(lacks the alpha channel)");
@@ -152,10 +154,15 @@ void process_file(void) {
       //        x, y, ptr[0], ptr[1], ptr[2], ptr[3]);
 
       /* set red value to 0 and green value to the blue one */
-      // ptr[0] = 50;
-      ptr[1] = 50;
-      ptr[2] = 50;
-      // ptr[3] = 255;
+      if(ptr[0] != ptr[1])
+        ptr[0] = 100;
+      else
+        ptr[0] = 100;
+      if(ptr[2] != ptr[1])
+        ptr[2] = 100;
+      else
+        ptr[2] = 100;
+      // ptr[3] = 255; // Alpha
     }
   }
 }
