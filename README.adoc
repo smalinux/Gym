@@ -1,0 +1,15 @@
+# RougeLike
+
+ASCII based graphics game.
+
+### Build
+....
+make
+....
+
+### Run
+....
+./RougeLike
+....
+
+video demo: https://www.youtube.com/watch?v=4vNrjhPuxMM
