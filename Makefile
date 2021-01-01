@@ -6,10 +6,7 @@ headers=  -lncurses -lpanel -lform -lmenu
 # 
 
 all:
-# 	gcc -o RogueLike.o RogueLike.c $(headers) -std=c99
-# 	gcc -o Ncurses.o Ncurses.c $(headers) -std=c99
-# 	gcc -o mySnake.o mySnake.c $(headers) -std=c99
-	gcc t_temp.c -o t_temp -Wall -Wextra -pedantic -std=c99
+		gcc -o RogueLike.o RogueLike.c $(headers) -std=c99
 
 clean:
 	rm *.o
